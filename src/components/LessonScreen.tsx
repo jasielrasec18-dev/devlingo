@@ -1,18 +1,17 @@
 import { useMemo, useState } from 'react';
 import { X, Heart } from 'lucide-react';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
-import type { Lesson, LessonQuestion } from './LessonsModal';
+import { useNavigate } from '@tanstack/react-router';
+import type { LessonQuestion } from './LessonsModal';
 import { SuccessPopUp } from './SuccessPopUp';
 import { ErrorPopUp } from './ErrorPopUp';
 import { completeLesson } from '../services/lessonsService';
 import { useAuth } from '../contexts/AuthContext';
+import { lessonStore } from '../stores/lessonStore';
 
 export const LessonScreen = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const lesson = useRouterState({
-    select: (state) => (state.location.state as { lesson?: Lesson } | undefined)?.lesson,
-  });
+  const lesson = lessonStore.get();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);

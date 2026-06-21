@@ -6,6 +6,7 @@ import { LearningPath } from '../components/LearningPath';
 import { LessonsModal, type Unit } from '../components/LessonsModal';
 import { getUnits } from '../services/unitsService';
 import { useAuth } from '../contexts/AuthContext';
+import { lessonStore } from '../stores/lessonStore';
 
 export const Route = createFileRoute('/home')({
   component: HomeComponent,
@@ -52,10 +53,10 @@ function HomeComponent() {
       (item) => String(item.id) === String(lessonId),
     );
     setIsModalOpen(false);
+    lessonStore.set(lesson);
     navigate({
       to: '/lessons/$lessonId',
       params: { lessonId: String(lessonId) },
-      state: { lesson },
     });
   };
 
