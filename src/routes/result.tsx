@@ -18,8 +18,6 @@ const ResultScreenComponent = () => {
 
   const correctAnswers = searchParams.correctAnswers || 0;
   const incorrectAnswers = searchParams.incorrectAnswers || 0;
-  const lessonId = searchParams.lessonId || '';
-  console.log(lessonId);
 
   const totalAnswers = correctAnswers + incorrectAnswers;
   const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
