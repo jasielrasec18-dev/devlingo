@@ -1,16 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error(
-    '❌ Supabase URL ou Anon Key não configurados!\n' +
-    'Por favor, configure as variáveis de ambiente no arquivo .env:\n' +
-    '- VITE_SUPABASE_URL=sua_url_do_supabase\n' +
-    '- VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase\n\n' +
-    'Copie o arquivo env.example para .env e preencha com suas credenciais.\n\n' +
-    'O app continuará rodando, mas as funcionalidades de autenticação não funcionarão.'
+    '❌ Supabase URL ou Publishable Key não configurados!\n' +
+    'Configure as variáveis de ambiente:\n' +
+    '- VITE_SUPABASE_URL\n' +
+    '- VITE_SUPABASE_PUBLISHABLE_KEY'
   );
 }
 
