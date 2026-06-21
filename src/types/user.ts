@@ -5,5 +5,5 @@ export type CreateUserProfileInput = {
 };
 
 export type CreateUserProfileResult =
-  | { success: true; data: unknown }
+  | { success: true; data: unknown; requiresEmailConfirmation?: boolean }
   | { success: false; error: string };

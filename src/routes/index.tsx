@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingScreen } from '../components/LoadingScreen';
 
@@ -9,22 +10,17 @@ export const Route = createFileRoute('/')({
 function IndexComponent() {
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
+  const [animationDone, setAnimationDone] = useState(false);
 
-  const handleLoadingFinish = () => {
-    if (!loading) {
-      if (isAuthenticated) {
-        navigate({ to: '/home', replace: true });
-      } else {
-        navigate({ to: '/signin', replace: true });
-      }
+  useEffect(() => {
+    if (animationDone && !loading) {
+      navigate({ to: isAuthenticated ? '/home' : '/signin', replace: true });
     }
-  };
+  }, [animationDone, loading, isAuthenticated, navigate]);
 
-  // LoadingScreen gerencia seu próprio timing e chama onFinish ao terminar
-  // Fundo roxo para não piscar branco enquanto o LoadingScreen carrega
   return (
     <div className="min-h-screen bg-[#8a2be2]">
-      <LoadingScreen onFinish={handleLoadingFinish} />
+      <LoadingScreen onFinish={() => setAnimationDone(true)} />
     </div>
   );
 }

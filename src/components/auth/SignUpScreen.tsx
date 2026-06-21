@@ -24,6 +24,7 @@ export const SignUpScreen = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
   const {
     register,
     handleSubmit,
@@ -47,8 +48,30 @@ export const SignUpScreen = () => {
       return;
     }
 
+    if (result.requiresEmailConfirmation) {
+      setEmailSent(true);
+      return;
+    }
+
     navigate({ to: '/home', replace: true });
   };
+
+  if (emailSent) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[#7c3aed] px-4">
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl text-center">
+          <div className="text-5xl mb-4">📧</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Confirme seu email</h1>
+          <p className="text-gray-500 text-sm">
+            Enviamos um link de confirmação para o seu email. Clique nele para ativar sua conta e fazer login.
+          </p>
+          <Link to="/signin" className="mt-6 inline-block text-sm font-semibold text-violet-600">
+            Já confirmei — Fazer login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[#7c3aed] px-4">

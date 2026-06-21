@@ -56,6 +56,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const ensureUserProfile = async (userId: string, email: string, metadata: Record<string, unknown>) => {
+    const { data: existing } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (!existing) {
+      const name = (metadata['name'] as string) || email.split('@')[0];
+      await supabase.from('user_profiles').insert({ id: userId, name, email });
+    }
+
+    await fetchUserProfile(userId);
+  };
+
   useEffect(() => {
     // Verificar sessão atual
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -72,13 +87,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        ensureUserProfile(
+          session.user.id,
+          session.user.email ?? '',
+          session.user.user_metadata ?? {},
+        );
       } else {
         setUserProfile(null);
       }
     });
 
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -115,10 +135,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<CreateUserProfileResult> => {
     const { name, email, password } = input;
 
-    // 1. Cria o usuário no sistema de autenticação do Supabase (auth.users)
+    // 1. Cria o usuário no Supabase Auth (nome salvo nos metadados)
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: { data: { name } },
     });
 
     if (authError) {
@@ -129,14 +150,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { success: false, error: "Erro ao criar usuário" };
     }
 
-    // 2. Insere dados adicionais na tabela user_profiles
+    // Sem sessão = confirmação de email habilitada no Supabase.
+    // O perfil será criado automaticamente em onAuthStateChange após a confirmação.
+    if (!authData.session) {
+      return { success: true, data: null, requiresEmailConfirmation: true };
+    }
+
+    // 2. Sem confirmação de email: cria perfil imediatamente
     const { data: profileData, error: profileError } = await supabase
       .from("user_profiles")
-      .insert({
-        id: authData.user.id,
-        name,
-        email,
-      })
+      .insert({ id: authData.user.id, name, email })
       .select()
       .single();
 
